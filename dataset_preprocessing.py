@@ -53,18 +53,53 @@ def remove_words_with_numbers(text):
 #remove extra spaces
 def remove_extra_spaces(text):
     return re.sub(' +', ' ', text)
-
+#remove emoji from the text
+def remove_emoji(text):
+    emoji_pattern = re.compile("["
+        u"\U0001F600-\U0001F64F"  # emoticons
+        u"\U0001F300-\U0001F5FF"  # symbols & pictographs
+        u"\U0001F680-\U0001F6FF"  # transport & map symbols
+        u"\U0001F1E0-\U0001F1FF"  # flags (iOS)
+        u"\U00002500-\U00002BEF"  # chinese char
+        u"\U00002702-\U000027B0"
+        u"\U00002702-\U000027B0"
+        u"\U000024C2-\U0001F251"
+        u"\U0001f926-\U0001f937"
+        u"\U00010000-\U0010ffff"
+        u"\u2640-\u2642" 
+        u"\u2600-\u2B55"
+        u"\u200d"
+        u"\u23cf"
+        u"\u23e9"
+        u"\u231a"
+        u"\ufe0f"  # dingbats
+        u"\u3030"
+                              "]+", flags=re.UNICODE)
+    return emoji_pattern.sub(r'', text)
 
 #apply all the above functions to the dataframe inside the preprocess_text function
-def preprocess_text(df, text_field):
-    df[text_field] = df[text_field].apply(lambda x: remove_punctuations(x))
-    df[text_field] = df[text_field].apply(lambda x: to_lowercase(x))
-    df[text_field] = df[text_field].apply(lambda x: expand_contractions(x))
-    df[text_field] = df[text_field].apply(lambda x: remove_stopwords(x))
-    df[text_field] = df[text_field].apply(lambda x: lemmatize_text(x))
-    df[text_field] = df[text_field].apply(lambda x: remove_words_with_numbers(x))
-    df[text_field] = df[text_field].apply(lambda x: remove_extra_spaces(x))
+def preprocess_text(df):
+    df = df.apply(lambda x: remove_punctuations(x))
+    df = df.apply(lambda x: to_lowercase(x))
+    df = df.apply(lambda x: expand_contractions(x))
+    #df = df.apply(lambda x: remove_stopwords(x))
+    df = df.apply(lambda x: lemmatize_text(x))
+    df = df.apply(lambda x: remove_words_with_numbers(x))
+    df = df.apply(lambda x: remove_extra_spaces(x))
+    df = df.apply(lambda x: remove_emoji(x))
     return df
+
+def preprocess_text_test(text):
+    text = remove_punctuations(text)
+    text = to_lowercase(text)
+    text = expand_contractions(text)
+    #text = remove_stopwords(text)
+    text = lemmatize_text(text)
+    text = remove_words_with_numbers(text)
+    text = remove_extra_spaces(text)
+    text = remove_emoji(text)
+    return text
+
 
 
 #visualize first 10 elements of the dataset
