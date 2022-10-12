@@ -183,7 +183,17 @@ def save_dataframe(df, filename, verbose=True):
     #save the dataframe in a csv file
     df.to_csv(filename, index=False)
     if verbose:
-        print("Dataframe saved in "+filename)    
+        print("Dataframe saved in "+filename)
+
+#function to eliminate rows with none values in a specific label from the dataframe
+def eliminate_none_values(df, label):
+    #get the index of the rows with none values in the label
+    indexNames = df[ df[label] == 'None' ].index
+    # Delete these row indexes from dataFrame
+    df.drop(indexNames , inplace=True)
+    return df
+#function to eliminate rows with none values in an array a specific cell from the dataframe
+
 
 def expand_targets(df,targets_names, verbose=True):
     #create a amtrix of size len(targets_names) x le
