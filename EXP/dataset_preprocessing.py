@@ -4,6 +4,22 @@ import json
 from collections import Counter
 import text_preprocessing
 
+# arrays of possible values for the target_group
+Race = ['African', 'Asian', 'Caucasian', 'Jewish', 'Hispanic', 'Arab', 'Refugee','Indian', 'Indigenous']  #['African','Arab','Asian','Caucasian','Hispanic']
+Religion = ['Buddhism', 'Christian', 'Hindu', 'Islam', 'Jewish']
+Gender = ['Men', 'Women']
+Sexual_Orientation = ['Homosexual'] #['Heterosexual','Gay']
+Miscellaneous =  ['None','Other']
+Economic = ['Economic']
+Disability = ['Disability']
+
+# array of possible values of the target_group column
+target_groups = ['Race', 'Religion', 'Gender', 'Sexual Orientation', 'Miscellaneous', 'Economic', 'Disability']
+
+# array of possible values of the target column
+target_values = ['African', 'Asian', 'Caucasian', 'Jewish', 'Hispanic', 'Arab', 'Refugee','Indian', 'Indigenous','Buddhism', 'Christian', 'Hindu', 'Islam',
+                 'Jewish','Men', 'Women','Homosexual','None','Other','Economic','Disability']
+
 # function to read a json file and convert it to a csv file
 def json_to_csv(json_path = 'hatexplain.json', csv_path = 'hatexplain.csv'):
     df = pd.read_json(json_path,orient = 'index')
@@ -65,8 +81,40 @@ def eliminate_rows(df, column_name, value):
 def apply_function_to_column(df, column_name, function):
     df[column_name] = df[column_name].apply(function)
     return df
-    
 
+# function to assign a target group based on the target column chek if the target is in a specific group
+def assign_target_group(targets):
+    targetGroup = []
+    for target in targets:
+        if target in Race:
+            targetGroup.append('Race')
+        if target in Religion:
+            targetGroup.append('Religion')
+        if target in Gender:
+            targetGroup.append('Gender')
+        if target in Sexual_Orientation:
+            targetGroup.append('Sexual Orientation')
+        if target in Miscellaneous:
+            targetGroup.append('Miscellaneous')
+        if target in Economic:
+            targetGroup.append('Economic')
+        if target in Disability:
+            targetGroup.append('Disability')
+    if len(targetGroup) == 0:
+        print(targets)
+    return targetGroup
+
+
+# function to read a df and return a df with a new comlumn that contains the target group based on the target column
+def create_target_group(df):
+    df['target_group'] = df['target'].apply(lambda x : assign_target_group(x))
+    return df
+
+#function to create a number of columns equal to the number of possible values and set to 1 the column that contains the value
+def create_binary_columns(df, name_column, possible_values_array):
+    for value in possible_values_array:
+        df[value] = df[name_column].apply(lambda x: 1 if value in x else 0)
+    return df
 
 # function to read a csv file and modify it's structure
 def restructure_dataset(csv_path = 'hatexplain.csv'):
@@ -91,8 +139,9 @@ def restructure_dataset(csv_path = 'hatexplain.csv'):
     df = eliminate_rows(df, 'target', 'None')
     # Preprocessing corpus
     df = apply_function_to_column(df, 'corpus', (lambda x : text_preprocessing.preprocess_string(x)))
+    #create a new column target_group
+    df = create_target_group(df)
+    df = create_binary_columns(df, 'target_group', target_groups)
+    #df = create_binary_columns(df, 'target', target_values)
     # Save the new dataset
     df.to_csv('hatexplainV2.csv', index = False)
-
-
-
