@@ -8,6 +8,8 @@ from sklearn.metrics import classification_report
 from sklearn.metrics import accuracy_score
 from sklearn.metrics import f1_score
 from sklearn.metrics import confusion_matrix
+import matplotlib.pyplot as plt
+import seaborn as sn
 
 # if the dataset is unbalanced, we can use this flag to balance it
 need_balancing = True
@@ -67,12 +69,22 @@ def train_and_save_classifiers(dataset_path, labels, test_size = 0.2, need_balan
     for label in labels:
         train_and_save_classifier(dataset_path, label, test_size, need_balancing)
 
+# function to save the confusion matrix of the classifier
+def save_confusion_matrix(conf_matrix, label_name):
+    df_cm = pd.DataFrame(conf_matrix, index = [i for i in "01"],
+                  columns = [i for i in "01"])
+    plt.figure(figsize = (10,7))
+    sn.heatmap(df_cm, annot=True)
+    plt.savefig(save_path+label_name+'_CM.png')
+
 # function to test the model with X_test, y_test
 def test_model(model, X_test, y_test, label_name):
     y_pred = model.predict(X_test)
     # get the report of the classifier
     print("Classification report:")
-    print(classification_report(y_test, y_pred))
+    report = classification_report(y_test, y_pred, output_dict=True)
+    print(report)
+
     
     #print accuracy of the classifier
     print("Classification accuracy:")
@@ -87,3 +99,4 @@ def test_model(model, X_test, y_test, label_name):
     print("Classification CM:")
     conf_matrix = confusion_matrix(y_test, y_pred)
     print(conf_matrix)
+    save_confusion_matrix(conf_matrix, label_name)

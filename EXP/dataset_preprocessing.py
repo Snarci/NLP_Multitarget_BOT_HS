@@ -116,6 +116,29 @@ def create_binary_columns(df, name_column, possible_values_array):
         df[value] = df[name_column].apply(lambda x: 1 if value in x else 0)
     return df
 
+# function to count how many records in a specific columns have a specific value and return an json object with the value and the percentage
+def count_value(df, column_name, value):
+    # count the number of records that have the value in the column
+    print(column_name)
+    count = len(df[df[column_name] == value])
+    print(count)
+    percentage = count / len(df)
+    print(percentage)
+    return {'label': column_name, 'value': value, 'percentage': percentage, 'count': count, 'total': len(df)}
+
+#function to count value for a set of columns
+def calculate_distribution(df, column_names, value):
+    res = []
+    for column_name in column_names:
+        res.append(count_value(df, column_name, value))
+    return res
+
+#function to save a array of json object in a json file
+def save_json(array, path):
+    with open(path, 'w') as outfile:
+        json.dump(array, outfile)
+
+
 # function to read a csv file and modify it's structure
 def restructure_dataset(csv_path = 'hatexplain.csv'):
     df = pd.read_csv(csv_path)
@@ -143,5 +166,7 @@ def restructure_dataset(csv_path = 'hatexplain.csv'):
     df = create_target_group(df)
     df = create_binary_columns(df, 'target_group', target_groups)
     #df = create_binary_columns(df, 'target', target_values)
+    #Print the distribution of each target
+    save_json(calculate_distribution(df, target_groups, 1), 'distribution.json')
     # Save the new dataset
     df.to_csv('hatexplainV2.csv', index = False)
