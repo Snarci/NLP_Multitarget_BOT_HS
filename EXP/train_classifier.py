@@ -7,6 +7,7 @@ from sklearn.model_selection import train_test_split
 from sklearn.metrics import classification_report
 from sklearn.metrics import accuracy_score
 from sklearn.metrics import f1_score
+from sklearn.metrics import roc_auc_score
 from sklearn.metrics import confusion_matrix
 import matplotlib.pyplot as plt
 import seaborn as sn
@@ -69,34 +70,32 @@ def train_and_save_classifiers(dataset_path, labels, test_size = 0.2, need_balan
     for label in labels:
         train_and_save_classifier(dataset_path, label, test_size, need_balancing)
 
-# function to save the confusion matrix of the classifier
-def save_confusion_matrix(conf_matrix, label_name):
-    df_cm = pd.DataFrame(conf_matrix, index = [i for i in "01"],
-                  columns = [i for i in "01"])
-    plt.figure(figsize = (10,7))
-    sn.heatmap(df_cm, annot=True)
-    plt.savefig(save_path+label_name+'_CM.png')
 
-# function to test the model with X_test, y_test
+# function to test the model and save result in csv file
 def test_model(model, X_test, y_test, label_name):
     y_pred = model.predict(X_test)
-    # get the report of the classifier
-    print("Classification report:")
-    report = classification_report(y_test, y_pred, output_dict=True)
-    print(report)
+    y_pred_proba = model.predict_proba(X_test)
+    # calculate how many different labels can be predicted
+    labels = list(set(y_test))
+    print(labels)
+    # save the result in csv file
+    df = pd.DataFrame({'y_test': y_test, 'y_pred': y_pred, 'y_pred_proba': y_pred_proba[:,1]})
+    df.to_csv(save_path+label_name+'_result.csv', index=False)
+    # print the accuracy score
+    print("accuracy score: ", accuracy_score(y_test, y_pred))
+    # print the f1 score
+    if(len(labels) == 2):
+        print("f1 score: ", f1_score(y_test, y_pred))
+    # save accuracy score, f1 score and auroc score in csv file
+    if(len(labels) == 2):
+        df = pd.DataFrame({'accuracy_score': [accuracy_score(y_test, y_pred)], 'f1_score': [f1_score(y_test, y_pred)]})
+    else:
+        df = pd.DataFrame({'accuracy_score': [accuracy_score(y_test, y_pred)], 'f1_score': [f1_score(y_test, y_pred, average='weighted')]})
+    df.to_csv(save_path+label_name+'_score.csv', index=False)
+    # make the consusion matrix based on the result
+    cm = confusion_matrix(y_test, y_pred)
+    # save the confusion matrix in csv file
+    df = pd.DataFrame(cm)
+    df.to_csv(save_path+label_name+'_confusion_matrix.csv', index=False) 
 
     
-    #print accuracy of the classifier
-    print("Classification accuracy:")
-    print(accuracy_score(y_test, y_pred))
-
-    #print Macro F1 score of the classifier
-    print("Macro F1 score:")
-    
-    print(f1_score(y_test, y_pred, average='macro'))
-
-    #get the confusion matrix of the classifier
-    print("Classification CM:")
-    conf_matrix = confusion_matrix(y_test, y_pred)
-    print(conf_matrix)
-    save_confusion_matrix(conf_matrix, label_name)
