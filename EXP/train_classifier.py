@@ -86,7 +86,10 @@ def test_model(model, X_test, y_test, label_name):
     labels = list(set(y_test))
     print(labels)
     # save the result in csv file
-    df = pd.DataFrame({'y_test': y_test, 'y_pred': y_pred, 'y_pred_proba': y_pred_proba[:,1]})
+    if(len(labels) == 2):
+        df = pd.DataFrame({'y_test': y_test, 'y_pred': y_pred, 'y_pred_proba1': y_pred_proba[:,0],'y_pred_proba2': y_pred_proba[:,1]})
+    else:
+        df = pd.DataFrame({'y_test': y_test, 'y_pred': y_pred, 'y_pred_proba1': y_pred_proba[:,0],'y_pred_proba2': y_pred_proba[:,1],'y_pred_proba3': y_pred_proba[:,2]})
     df.to_csv(save_path+label_name+'_result.csv', index=False)
     # print the accuracy score
     print("accuracy score: ", accuracy_score(y_test, y_pred))
