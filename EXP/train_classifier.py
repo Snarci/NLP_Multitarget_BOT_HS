@@ -11,6 +11,7 @@ from sklearn.metrics import roc_auc_score
 from sklearn.metrics import confusion_matrix
 import matplotlib.pyplot as plt
 import seaborn as sn
+import os
 
 # if the dataset is unbalanced, we can use this flag to balance it
 need_balancing = True
@@ -50,18 +51,18 @@ def train_model(dataset_path, label_name, test_size = 0.2, need_balancing = True
     return classifier, X_test, y_test
 
 # function to save the model
-def save_model(model, model_name):
-    pickle.dump(model, open(save_path+model_name+'.sav', 'wb'))
+def save_model(model, model_path):
+    pickle.dump(model, open(model_path +'.sav', 'wb'))
 
 # function to train and save the model
 def train_and_save_classifier(dataset_path, label_name, test_size = 0.2, need_balancing = True):
     model, X_test, y_test = train_model(dataset_path, label_name, test_size, need_balancing)
-    save_model(model, label_name)
+    save_model(model, (save_path + label_name))
     test_model(model, X_test, y_test, label_name)
 
 # function to load the model
-def load_model(model_name):
-    model = pickle.load(open(save_path+model_name+'.sav', 'rb'))
+def load_model(model_path):
+    model = pickle.load(open(model_path + '.sav', 'rb'))
     return model
 
 # function to train one model for each label
@@ -69,6 +70,13 @@ def train_and_save_classifiers(dataset_path, labels, test_size = 0.2, need_balan
     for label in labels:
         train_and_save_classifier(dataset_path, label, test_size, need_balancing)
 
+def load_all_classfiers_in_folder(folder_name):
+    list_classifiers = []
+    for filename in os.listdir(folder_name):
+        if filename.endswith(".sav") and filename != "trained_classifier_Labels.sav":
+            model_name = filename.split(".")[0]
+            list_classifiers.append(load_model(folder_name + model_name))
+    return list_classifiers
 
 # function to test the model and save result in csv file
 def test_model(model, X_test, y_test, label_name):
@@ -96,5 +104,7 @@ def test_model(model, X_test, y_test, label_name):
     # save the confusion matrix in csv file
     df = pd.DataFrame(cm)
     df.to_csv(save_path+label_name+'_confusion_matrix.csv', index=False) 
+
+
 
     
