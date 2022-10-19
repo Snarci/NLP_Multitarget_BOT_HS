@@ -5,16 +5,16 @@ from collections import Counter
 import text_preprocessing
 
 # arrays of possible values for the target_group
-Race = ['African', 'Asian', 'Caucasian', 'Jewish', 'Hispanic', 'Arab', 'Refugee','Indian', 'Indigenous']  #['African','Arab','Asian','Caucasian','Hispanic']
+Race = ['African', 'Asian', 'Caucasian', 'Hispanic', 'Arab','Indian']  #['African','Arab','Asian','Caucasian','Hispanic']
 Religion = ['Buddhism', 'Christian', 'Hindu', 'Islam', 'Jewish']
 Gender = ['Men', 'Women']
 Sexual_Orientation = ['Homosexual'] #['Heterosexual','Gay']
-Miscellaneous =  ['None','Other']
-Economic = ['Economic']
-Disability = ['Disability']
+Miscellaneous =  ['None','Other','Refugee', 'Indigenous','Economic','Disability']
+#Economic = ['Economic']
+#Disability = ['Disability']
 
 # array of possible values of the target_group column
-target_groups = ['Race', 'Religion', 'Gender', 'Sexual Orientation', 'Miscellaneous', 'Economic', 'Disability']
+target_groups = ['Race', 'Religion', 'Gender', 'Sexual Orientation', 'Miscellaneous']
 
 # array of possible values of the target column
 target_values = ['African', 'Asian', 'Caucasian', 'Jewish', 'Hispanic', 'Arab', 'Refugee','Indian', 'Indigenous','Buddhism', 'Christian', 'Hindu', 'Islam',
@@ -46,7 +46,7 @@ def string_to_objJson(string):
             label = key
             break
     else:
-        label = 'None'
+        label = 'Uncertainty'
 
     target = [item for sublist in target for item in sublist]
     countTarget = Counter(target)
@@ -56,7 +56,7 @@ def string_to_objJson(string):
             targets.append(key)
 
     if len(targets) == 0:
-        obj = {'label': label, 'target': 'None'}
+        obj = {'label': label, 'target': 'Uncertainty'}
     else:
         #create a json obj using the label and targets
         obj = {"label": label, "target": targets}
@@ -96,10 +96,10 @@ def assign_target_group(targets):
             targetGroup.append('Sexual Orientation')
         if target in Miscellaneous:
             targetGroup.append('Miscellaneous')
-        if target in Economic:
-            targetGroup.append('Economic')
-        if target in Disability:
-            targetGroup.append('Disability')
+        #if target in Economic:
+        #    targetGroup.append('Economic')
+        #if target in Disability:
+        #    targetGroup.append('Disability')
     if len(targetGroup) == 0:
         print(targets)
     return targetGroup
@@ -156,10 +156,10 @@ def restructure_dataset(csv_path = 'hatexplain.csv'):
     #trasmorm in a single string the tokens column
     df['corpus'] = df['post_tokens'].apply(lambda x : merge_tokens(x))
     df = df[['label', 'target', 'corpus']]
-    #eliminate rows with label = 'None'
-    df = eliminate_rows(df, 'label', 'None')
-    #eliminate rows with target = 'None'
-    df = eliminate_rows(df, 'target', 'None')
+    #eliminate rows with label = 'Uncertainty'
+    df = eliminate_rows(df, 'label', 'Uncertainty')
+    #eliminate rows with target = 'Uncertainty'
+    df = eliminate_rows(df, 'target', 'Uncertainty')
     # Preprocessing corpus
     df = apply_function_to_column(df, 'corpus', (lambda x : text_preprocessing.preprocess_string(x)))
     #create a new column target_group

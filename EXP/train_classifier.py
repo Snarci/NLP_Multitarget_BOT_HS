@@ -35,7 +35,6 @@ def balance_dataset(X_train, y_train):
     X_train, y_train = rus.fit_resample(X_train, y_train)
     return X_train, y_train
 
-
 # function to train the model
 def train_model(dataset_path, label_name, test_size = 0.2, need_balancing = True):
     df = pd.read_csv(dataset_path)
@@ -88,7 +87,7 @@ def test_model(model, X_test, y_test, label_name):
         print("f1 score: ", f1_score(y_test, y_pred))
     # save accuracy score, f1 score and auroc score in csv file
     if(len(labels) == 2):
-        df = pd.DataFrame({'accuracy_score': [accuracy_score(y_test, y_pred)], 'f1_score': [f1_score(y_test, y_pred)]})
+        df = pd.DataFrame({'accuracy_score': [accuracy_score(y_test, y_pred)], 'f1_score': [f1_score(y_test, y_pred, average='weighted')]})
     else:
         df = pd.DataFrame({'accuracy_score': [accuracy_score(y_test, y_pred)], 'f1_score': [f1_score(y_test, y_pred, average='weighted')]})
     df.to_csv(save_path+label_name+'_score.csv', index=False)
