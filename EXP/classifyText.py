@@ -1,10 +1,11 @@
 from unicodedata import name
 import dataset_preprocessing
+import text_preprocessing
 import pickle
 
 
-def classify_text(text, label_classifier,list_target_classifiers, treshold_bot = 0.4,verbose=True ):
-    text = dataset_preprocessing.preprocess_text_test(text)
+def classify_text(text, label_classifier,list_target_classifiers, name_classifers, treshold_bot = 0.4,verbose=True ):
+    text = text_preprocessing.preprocess_string(text)
     tfidf = pickle.load(open("tfidf.pickle", "rb"))
     text = tfidf.transform([text])
 
@@ -21,6 +22,6 @@ def classify_text(text, label_classifier,list_target_classifiers, treshold_bot =
             label_probability = label_probability[0][1]
             list_label_probabilities.append(label_probability)
         max_index = list_label_probabilities.index(max(list_label_probabilities))
-        return True, "the message is: "+str(label[0]) + " towards the "+str(list_target_classifiers[max_index]) + " target"
+        return True, "the message is: "+str(label[0]) + " towards the "+str(name_classifers[max_index]) + " target"
     else: 
         return False , "This is a normal message."

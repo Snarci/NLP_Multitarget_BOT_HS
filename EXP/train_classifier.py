@@ -23,9 +23,10 @@ def split_dataset(dataset_path, label_name ,test_size = 0.2):
     df = pd.read_csv(dataset_path)
     # apply TF-IDF to the corpus column
     tfidf = TfidfVectorizer()
+    tfidf.fit(df['corpus'])
     #save the vectorizer for future use
     pickle.dump(tfidf, open("tfidf.pickle", "wb"))
-    corpus = tfidf.fit_transform(df['corpus'])
+    corpus = tfidf.transform(df['corpus'])
     # split the dataset in train and test
     X_train, X_test, y_train, y_test = train_test_split(corpus, df[label_name], test_size=test_size, random_state=42)
     return X_train, X_test, y_train, y_test
@@ -72,11 +73,13 @@ def train_and_save_classifiers(dataset_path, labels, test_size = 0.2, need_balan
 
 def load_all_classfiers_in_folder(folder_name):
     list_classifiers = []
+    name_classifer = []
     for filename in os.listdir(folder_name):
-        if filename.endswith(".sav") and filename != "trained_classifier_Labels.sav":
+        if filename.endswith(".sav") and filename != "label.sav":
+            name_classifer.append(filename.split('.')[0])
             model_name = filename.split(".")[0]
             list_classifiers.append(load_model(folder_name + model_name))
-    return list_classifiers
+    return list_classifiers, name_classifer
 
 # function to test the model and save result in csv file
 def test_model(model, X_test, y_test, label_name):

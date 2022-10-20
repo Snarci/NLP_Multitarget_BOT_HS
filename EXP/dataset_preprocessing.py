@@ -138,6 +138,8 @@ def save_json(array, path):
     with open(path, 'w') as outfile:
         json.dump(array, outfile)
 
+def get_target_group():
+    return target_groups
 
 # function to read a csv file and modify it's structure
 def restructure_dataset(csv_path = 'hatexplain.csv'):

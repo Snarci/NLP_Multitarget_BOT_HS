@@ -10,9 +10,9 @@ class Message:
     def __repr__(self):
         return self.msg
 
-    def isAttack(self,label_classifier,targets_classifiers):
-        isAttack, response = classifyText.classify_text(self.msg, label_classifier, targets_classifiers, treshold_bot = 0.4,verbose=True )
-        return isAttack, response
+    def classifyMessage(self,label_classifier,targets_classifiers, name_classifers):
+        flag, response = classifyText.classify_text(self.msg, label_classifier, targets_classifiers, name_classifers, treshold_bot = 0.4,verbose=True )
+        return flag, response
 
 class User:
     def __init__(self, id, username = None):

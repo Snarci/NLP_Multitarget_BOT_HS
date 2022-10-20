@@ -9,7 +9,7 @@ from handleMsg import User
 import re
 import train_classifier
 
-targets_classifiers = train_classifier.load_all_classfiers_in_folder('./Save/')
+targets_classifiers, name_classifers = train_classifier.load_all_classfiers_in_folder('./Save/')
 label_classifier = train_classifier.load_model('./Save/label')
 
 print("Loading bot...")
@@ -49,12 +49,12 @@ def unknown_text(update: Update, context: CallbackContext):
 		user_list.append(user)
 		print("Added user : " + user.__str__())
 
-	isAttack, response = msg.isAttack(label_classifier,targets_classifiers)
+	isAttack, response = msg.classifyMessage(label_classifier,targets_classifiers, name_classifers)
 
 	if(isAttack):
 		update.message.reply_text("@" + user.__str__() + " " + response)
-	else: 
-		update.message.reply_text("@" + user.__str__() + " Good User")
+	#else: 
+		#update.message.reply_text("@" + user.__str__() + " Good User")
 	
 
 
