@@ -1,0 +1,8 @@
+pip install python-telegram-bot
+pip install pandas
+pip install nltk
+pip install contractions
+pip install scikit-learn
+pip install imblearn
+pip install matplotlib
+pip install seaborn
